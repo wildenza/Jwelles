@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slot Machine Surprise</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: yellow;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    .slot-machine {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .slot {
+      width: 200px;
+      height: 200px;
+      background: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      font-size: 2.5em;
+      font-weight: bold;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      transform-origin: center;
+    }
+
+    button {
+      padding: 20px 40px;
+      font-size: 1.5em;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #218838;
+    }
+
+    .confetti {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #ffd700;
+      animation: fall 3s linear infinite;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes spin {
+      0% { transform: rotateX(0deg); }
+      100% { transform: rotateX(360deg); }
+    }
+
+    .slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .congrats-message {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: black;
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  </style>
+</head>
+<body>
+  <div class="slot-machine">
+    <div class="slot" id="slot1">?</div>
+    <div class="slot" id="slot2">?</div>
+    <div class="slot" id="slot3">?</div>
+  </div>
+  <button id="spin-button">Spin</button>
+  <div class="confetti" id="confetti"></div>
+  <div id="congrats-message" class="congrats-message" style="display: none;">
+    Congrats! You have won a Jackie Welles Figurine, estimated arrival time: Early March 2025
+  </div>
+
+  <script>
+    const slots = [
+      document.getElementById('slot1'),
+      document.getElementById('slot2'),
+      document.getElementById('slot3')
+    ];
+    const spinButton = document.getElementById('spin-button');
+    const confettiContainer = document.getElementById('confetti');
+    const congratsMessage = document.getElementById('congrats-message');
+
+    let spinCount = 0;
+
+    function spinSlots() {
+      slots.forEach(slot => {
+        slot.textContent = "?";
+        slot.style.animation = "spin 0.5s linear infinite";
+      });
+
+      setTimeout(() => {
+        slots.forEach(slot => {
+          slot.style.animation = "";
+        });
+
+        if (spinCount < 2) {
+          slots.forEach(slot => (slot.textContent = "FAIL"));
+        } else {
+          slots.forEach(slot => {
+            slot.textContent = "";
+            const img = document.createElement('img');
+            img.src = 'jk.png';
+            img.alt = 'Prize';
+            slot.appendChild(img);
+          });
+          showInfiniteConfetti();
+          congratsMessage.style.display = "block";
+        }
+
+        spinCount++;
+      }, 1500);
+    }
+
+    function showInfiniteConfetti() {
+      setInterval(() => {
+        for (let i = 0; i < 50; i++) {
+          const confettiPiece = document.createElement('div');
+          confettiPiece.classList.add('confetti-piece');
+          confettiPiece.style.left = Math.random() * 100 + 'vw';
+          confettiPiece.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+          confettiPiece.style.animationDelay = Math.random() * 2 + 's';
+          confettiContainer.appendChild(confettiPiece);
+
+          setTimeout(() => confettiPiece.remove(), 3000);
+        }
+      }, 500);
+    }
+
+    spinButton.addEventListener('click', () => {
+      if (spinCount < 3) {
+        slots.forEach(slot => slot.style.animation = "spin 1s linear infinite");
+        spinSlots();
+      }
+    });
+  </script>
+</body>
+</html>
